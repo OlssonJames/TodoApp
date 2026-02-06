@@ -1,0 +1,117 @@
+body {
+    background: #f4f6fb;
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.todo-app {
+    width: 420px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+    .todo-app h1 {
+        text-align: center;
+        margin-bottom: 24px;
+        font-weight: 600;
+    }
+
+.add-task {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+    .add-task input {
+        flex: 1;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    .add-task button {
+        padding: 0 16px;
+        border-radius: 8px;
+        border: none;
+        background: #4f46e5;
+        color: white;
+        cursor: pointer;
+    }
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 6px;
+    border-bottom: 1px solid #eee;
+}
+
+    .task:last-child {
+        border-bottom: none;
+    }
+
+    .task label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+    }
+
+    .task input {
+        display: none;
+    }
+
+    .task .check {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        border: 2px solid #999;
+        position: relative;
+    }
+
+    .task input:checked + .check {
+        background: #4f46e5;
+        border-color: #4f46e5;
+    }
+
+        .task input:checked + .check::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+    .task .text {
+        font-size: 14px;
+    }
+
+    .task.done .text {
+        text-decoration: line-through;
+        color: #999;
+    }
+
+.delete {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+    .delete:hover {
+        color: #e11d48;
+    }

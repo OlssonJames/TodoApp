@@ -1,0 +1,20 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject AuthService Auth
+@inject NavigationManager Nav
+<div id="Login_container">
+
+    <h3>Enter your username here:</h3>
+    <input placeholder="Enter User name..." @bind="UserName" />
+
+    <h3>Enter your PhoneNumber here:</h3>
+    <input placeholder="Enter User PhoneNumber" @bind="Number" />
+
+    <h3>Enter your Gmail here:</h3>
+    <input placeholder="Enter User Gmail" @bind="Gmail" />
+
+    <button @onclick="InsertUser">Login</button>
+    <p>@Status</p>
+
+
+</div>

@@ -1,0 +1,33 @@
+﻿@page "/home"
+
+@rendermode InteractiveServer
+<PageTitle>Home</PageTitle>
+
+<div class="todo-app">
+    <h1>My To-Do</h1>
+
+    <div class="add-task">
+        <input placeholder="Add a new task…" @bind="TaskName" />
+        <button @onclick="AddTask">Add</button>
+    </div>
+
+    <ul class="task-list">
+        @foreach (var item in TasksModel)
+        {
+            <li class="task @(item.IsDone ? "done" : "")">
+                <label>
+                    <input type="checkbox"
+                           checked="@item.IsDone"
+                           @onchange="e => ToggleDone(item.TaskId, (bool)e.Value!)" />
+                    <span class="check"></span>
+                    <span class="text">@item.TaskName</span>
+                </label>
+
+                <button class="delete"
+                        @onclick="() => DeleteTask(item.TaskId)">
+                    ✕
+                </button>
+            </li>
+        }
+    </ul>
+</div>
