@@ -9,6 +9,7 @@
     <div class="add-task">
         <input placeholder="Add a new task…" @bind="TaskName" />
         <button @onclick="AddTask">Add</button>
+        <p>Saving: @_isSaving</p>
     </div>
 
     <ul class="task-list">

@@ -19,36 +19,32 @@ public partial class Home
         private const string ConnStr = "Server=.;Database=Todo;Trusted_Connection=true;Encrypt=False";
 
         private bool _isSaving;
-
-        private int LastCreatedTaskId;
+        private int? _userId;
+        private bool _initialized;
         public List<TodoTask> TasksModel { get; set; } = new();
         [Inject] public AuthService Auth { get; set; } = default!;
         [Inject] public NavigationManager Nav { get; set; } = default!;
         private bool _loaded;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (!firstRender || _loaded)
-                return;
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (!firstRender || _initialized) return;
+    _initialized = true;
 
-            _loaded = true;
+    _userId = await Auth.GetUserId();
+    if (_userId is null)
+    {
+        Nav.NavigateTo("/login", true);
+        return;
+    }
 
-            var userId = await Auth.GetUserId();
-            if (userId is null)
-            {
-                Nav.NavigateTo("/login", true);
-                return;
-            }
-
-            await LoadTask(userId.Value);
-            StateHasChanged();
-        }
-
+    await LoadTask(_userId.Value);
+    StateHasChanged();
+}
 
         private async Task AddTask()
         {
-            var userId = await Auth.GetUserId();
-            if (userId is null)
+            if (_userId is null)
             {
                 Nav.NavigateTo("/login", true);
                 return;
@@ -66,14 +62,13 @@ public partial class Home
                 await using var cmd = conn.CreateCommand();
                 cmd.CommandText = "dbo.InsertTask";
                 cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@UserId", userId.Value);
+                cmd.Parameters.AddWithValue("@UserId", _userId.Value);
                 cmd.Parameters.AddWithValue("@TaskName", TaskName);
 
                 await cmd.ExecuteNonQueryAsync();
 
                 TaskName = "";
-                await LoadTask(userId.Value);
+                await LoadTask(_userId.Value);
             }
             finally
             {
@@ -83,26 +78,31 @@ public partial class Home
 
         private async System.Threading.Tasks.Task DeleteTask(int TaskId)
         {
-            var userId = await Auth.GetUserId();
-            if (userId is null)
+            if (_userId is null) return;
+            _isSaving = true;
+            try
             {
-                Nav.NavigateTo("/login", true);
-                return;
+                await using var conn = new SqlConnection(ConnStr);
+                await conn.OpenAsync();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "dbo.DeleteTask";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", TaskId);
+                cmd.Parameters.AddWithValue("@UserId", _userId.Value);
+
+                await cmd.ExecuteNonQueryAsync();
+
+
+                await LoadTask(_userId.Value);
+
             }
-            
-            await using var conn = new SqlConnection(ConnStr);
-            await conn.OpenAsync();
+            finally
+            {
+                _isSaving = false;
+            }
 
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = "dbo.DeleteTask";
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@id", TaskId);
-            cmd.Parameters.AddWithValue("@UserId", userId.Value);
 
-            await cmd.ExecuteNonQueryAsync();
-            
-          
-            await LoadTask(userId.Value);
 
         }
         private async System.Threading.Tasks.Task LoadTask(int UserId)
@@ -129,27 +129,23 @@ public partial class Home
 
 
         }
-        private async System.Threading.Tasks.Task ToggleDone(int taskId, bool IsDone)
+        private async Task ToggleDone(int taskId, bool isDone)
         {
-            var userId = await Auth.GetUserId();
-            if (userId is null)
-            {
-                Nav.NavigateTo("/login", true);
-                return;
-            }
+            if (_userId is null) return;
+
             await using var conn = new SqlConnection(ConnStr);
             await conn.OpenAsync();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "dbo.SetTaskDone";   // ← MISSING LINE
+            cmd.CommandText = "dbo.SetTaskDone";
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@id", taskId);
-            cmd.Parameters.AddWithValue("@IsDone", IsDone);
-
+            cmd.Parameters.AddWithValue("@Id", taskId);
+            cmd.Parameters.AddWithValue("@UserId", _userId.Value);
+            cmd.Parameters.AddWithValue("@IsDone", isDone);
 
             await cmd.ExecuteNonQueryAsync();
-            await LoadTask(userId.Value);
-
+            await LoadTask(_userId.Value);
+            StateHasChanged();
         }
 
 

@@ -1,8 +1,9 @@
 ﻿@page "/"
+@page "/signup"
 @rendermode InteractiveServer
 @inject AuthService Auth
 @inject NavigationManager Nav
-<div id="Login_container">
+<div id="singup_container">
 
     <h3>Enter your username here:</h3>
     <input placeholder="Enter User name..." @bind="UserName" />
@@ -10,10 +11,10 @@
     <h3>Enter your PhoneNumber here:</h3>
     <input placeholder="Enter User PhoneNumber" @bind="Number" />
 
-    <h3>Enter your Gmail here:</h3>
+    <h3>Enter your Gmail here:</h3> <p>This will act as your password</p>
     <input placeholder="Enter User Gmail" @bind="Gmail" />
 
-    <button @onclick="InsertUser">Login</button>
+    <button @onclick="InsertUser">Singup</button>
     <p>@Status</p>
 
 

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace TodoApp.Components.Pages
 {
-    public partial class Login
+    public partial class Singup
     {
 
         public string UserName { get; set; }
